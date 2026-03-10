@@ -1,5 +1,6 @@
 import User from "../models/user.model.js";
 import Notification from "../models/notification.model.js";
+import cloudinary from "cloudinary";
 
 export const getUserProfile = async (req, res) => {
 	const { username } = req.params;
@@ -109,17 +110,19 @@ export const updateUser = async (req, res) => {
 			}
 
 			const salt = await bcrypt.genSalt(10);
-			user.password = await bcrypt.hash(newPassword, salt);
+			user.password = await bcrypt.hash(newPassword, salt); // Overriding the password with new password
 		}
 
-		if (profileImg) {
+		if (profileImg) { // to update or store image we are using the claudinary
 			if (user.profileImg) {
-				// https://res.cloudinary.com/dyfqon1v6/image/upload/v1712997552/zmxorcxexpdbh8r0bkjb.png
+				// https://res.cloudinary.com/dyfqon1v6/image/upload/v1712997552/zmxorcxexpdbh8r0bkjb.png 
+				// If user has already uploaded the image then we have to destroy it or else it take up the space
+				// to distroy we need the unique id from the profile image url 
 				await cloudinary.uploader.destroy(user.profileImg.split("/").pop().split(".")[0]);
 			}
 
-			const uploadedResponse = await cloudinary.uploader.upload(profileImg);
-			profileImg = uploadedResponse.secure_url;
+			const uploadedResponse = await cloudinary.uploader.upload(profileImg);// when user gives the profileImg which is a url or from folder it is uploaded to cloudinary
+			profileImg = uploadedResponse.secure_url; // this line gives a url which will be stored in database
 		}
 
 		if (coverImg) {
@@ -131,7 +134,7 @@ export const updateUser = async (req, res) => {
 			coverImg = uploadedResponse.secure_url;
 		}
 
-		user.fullName = fullName || user.fullName;
+		user.fullName = fullName || user.fullName; // left:right :: new data from update form:old data
 		user.email = email || user.email;
 		user.username = username || user.username;
 		user.bio = bio || user.bio;
