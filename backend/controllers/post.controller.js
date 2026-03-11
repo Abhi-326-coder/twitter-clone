@@ -187,7 +187,7 @@ export const getFollowingPosts = async (req, res) => {
 		const following = user.following;
 
 		const feedPosts = await Post.find({ user: { $in: following } })
-			.sort({ createdAt: -1 })
+			.sort({ createdAt: -1 }) // So that we get the latest posts at the top
 			.populate({
 				path: "user",
 				select: "-password",
@@ -195,7 +195,7 @@ export const getFollowingPosts = async (req, res) => {
 			.populate({
 				path: "comments.user",
 				select: "-password",
-			});
+			}); 
 
 		res.status(200).json(feedPosts);
 	} catch (error) {
