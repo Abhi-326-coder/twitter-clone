@@ -58,3 +58,29 @@ export const deletePost = async (req, res) => {
 		res.status(500).json({ error: "Internal server error" });
 	}
 };
+export const commentOnPost = async (req, res) => {
+	try {
+		const { text } = req.body;
+		const postId = req.params.id;// id of the user who posted it 
+		const userId = req.user._id;// req.user comes from the protectRoute So this is logged in user data
+
+		if (!text) {
+			return res.status(400).json({ error: "Text field is required" });
+		}
+		const post = await Post.findById(postId);
+
+		if (!post) {
+			return res.status(404).json({ error: "Post not found" });
+		}
+
+		const comment = { user: userId, text }; // this is the data we are going to push having userId and text created by user
+
+		post.comments.push(comment); // way to add comment of the user in comments array
+		await post.save();
+
+		res.status(200).json(post);
+	} catch (error) {
+		console.log("Error in commentOnPost controller: ", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+};
