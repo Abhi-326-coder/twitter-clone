@@ -8,7 +8,7 @@ import {
 	// getFollowingPosts,
 	// getLikedPosts,
 	// getUserPosts,
-	// likeUnlikePost,
+	likeUnlikePost,
 } from "../controllers/post.controller.js";
 
 const router = express.Router();

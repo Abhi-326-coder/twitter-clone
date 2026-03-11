@@ -1,5 +1,6 @@
 import Post from '../models/post.model.js';
 import User from '../models/user.model.js';
+import Notification from '../models/notification.model.js';
 import cloudinary from 'cloudinary';
 
 export const createPost = async (req, res) => {
@@ -81,6 +82,50 @@ export const commentOnPost = async (req, res) => {
 		res.status(200).json(post);
 	} catch (error) {
 		console.log("Error in commentOnPost controller: ", error);
+		res.status(500).json({ error: "Internal server error" });
+	}
+};
+
+export const likeUnlikePost = async (req, res) => {
+	try {
+		const userId = req.user._id;
+		const { id: postId } = req.params;
+
+		const post = await Post.findById(postId);
+
+		if (!post) {
+			return res.status(404).json({ error: "Post not found" });
+		}
+
+		const userLikedPost = post.likes.includes(userId); // Checks if the logged in userId is included in likes array
+
+		// if userLikedPost exists it means user has already liked it So we need to Unlock it 
+		if (userLikedPost) {
+			// Unlike post
+			// Post.updateOne(Object to be updated, updated Object);
+			await Post.updateOne({ _id: postId }, { $pull: { likes: userId } }); // removing that id from the Post model database as it is stored there
+			await User.updateOne({ _id: userId }, { $pull: { likedPosts: postId } }); // removing that id from the User liked Post model database as it is stored there
+
+			const updatedLikes = post.likes.filter((id) => id.toString() !== userId.toString()); // UI changes
+			res.status(200).json(updatedLikes);
+		} else {
+			// Like post
+			post.likes.push(userId);
+			await User.updateOne({ _id: userId }, { $push: { likedPosts: postId } });
+			await post.save(); // few changes are made so need to be changed
+
+			const notification = new Notification({
+				from: userId,
+				to: post.user,
+				type: "like",
+			});
+			await notification.save();
+
+			const updatedLikes = post.likes;
+			res.status(200).json(updatedLikes);
+		}
+	} catch (error) {
+		console.log("Error in likeUnlikePost controller: ", error);
 		res.status(500).json({ error: "Internal server error" });
 	}
 };
