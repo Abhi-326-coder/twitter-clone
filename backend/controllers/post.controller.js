@@ -114,7 +114,7 @@ export const likeUnlikePost = async (req, res) => {
 			await User.updateOne({ _id: userId }, { $push: { likedPosts: postId } });
 			await post.save(); // few changes are made so need to be changed
 
-			const notification = new Notification({
+			const notification = new Notification({ // whenever I like a notification is created in Notification model
 				from: userId,
 				to: post.user,
 				type: "like",
