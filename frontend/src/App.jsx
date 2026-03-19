@@ -4,6 +4,7 @@ import SignUpPage from "./pages/auth/signup/SignUpPage.jsx";
 import LoginPage from "./pages/auth/login/LoginPage.jsx";
 import Sidebar from "./components/common/Sidebar.jsx";
 import RightPanel from "./components/common/RightPanel.jsx";
+import NotificationPage from "./pages/notification/NotificationPage.jsx"
 
 function App() {
     return (
@@ -13,6 +14,7 @@ function App() {
                     <Route path='/' element={<HomePage />} />
                     <Route path='/signup' element={<SignUpPage />} />
                     <Route path='/login' element={<LoginPage />} />
+                    <Route path='/notification' element={<LoginPage />} />
                 </Routes>
                 <RightPanel/>
             </div>
