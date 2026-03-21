@@ -2,6 +2,8 @@ import {useMutation, useQueryClient} from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 
 
+
+
 // @tanstack/react-query is mainly used while fetching the data  
 const useFollow = ()=>{
     const queryClient = useQueryClient(); // to invalidate some queries 
